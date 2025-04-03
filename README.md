@@ -1,10 +1,10 @@
 <div align="center">
-  <h1 
+  <h1
     style="font-size: 3rem; font-weight: bold; color: rgb(150, 108, 190);"
     >
-    Tamplete
+    DPKG PACKAGE
   </h1>
   <h3>
-    This is a template repo
+    Create a deb package for your bash or python scripts and compiled binaries.
   </h3>
 </div>

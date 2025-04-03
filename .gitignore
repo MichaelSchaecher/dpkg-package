@@ -1,3 +1,11 @@
 .vscode/
 
 build/
+
+*.gz
+*.xz
+*.deb
+*.tar
+changelog
+version
+md5sums
