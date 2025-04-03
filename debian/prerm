@@ -1,0 +1,8 @@
+#!/bin/env bash
+
+case "${1}" in
+    remove|purge                ) ;;
+    *                           )
+        echo "prerm called with unknown argument ${1}" >&2 ; exit 0
+    ;;
+esac

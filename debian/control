@@ -1,0 +1,26 @@
+Package: dpkg-builder
+Version:
+Section: devel
+Priority: optional
+Maintainer:
+Installed-Size:
+Homepage:
+
+# Default values is set according to system architecture detected by dpkg
+# in the build process. This is a placeholder for the actual value.
+Architecture:
+Depends: dpkg-deb, dpkg-changelog
+Build-Depends: debhelper (>= 9)
+
+# In most cases this will be empty, but if you want to build a package that
+# conflicts with another package, you can specify it here.
+# For example, if you are building a package that conflicts with an older
+# version of dpkg, you can specify it here.
+# Conflicts: dpkg (<< 1.17.0)
+#
+# This is a placeholder for the actual value.
+Conflicts:
+Description: A tool to build Debian packages
+ This package provides a set of tools to build Debian packages from a set
+ of predefined files. It is designed to be used by developers who want to
+ create Debian packages quickly and easily.
