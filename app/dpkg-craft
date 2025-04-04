@@ -1,18 +1,64 @@
 #!/bin/env bash
 
+function app_error { echo "${appName}: ${1}" >&2 ; exit 1 ; }
+
 set -eo pipefail
 
+appName="dpkg-craft"
+appVersion="$(cat /usr/share/doc/${appName}/version 2>/dev/null || echo "unknown")"
+
+versionInfo="$(cat << EOF
+${appName} - ( version: ${appVersion} ) - $(date +%Y-%m-%d\ %H:%M)
+EOF
+)"
+
+while true ; do case "${1}" in
+    -c|--config              )
+        [[ "${2}" != -* ]] || app_error "Invalid configuration file: ${2}"
+        test -f "${2}" || app_error "Configuration file not found: ${2}"
+        source "${2}"
+    ;;
+    -d|--debug               ) set -x ;;
+    -h|--help                ) echo "${versionInfo}" ; echo "Usage: ${appName} [options]" ; exit 0 ;;
+    -v|--version            ) echo "${versionInfo}" ; exit 0 ;;
+esac ; [[ "${1}" =~ ^- ]] || break ; shift ; done
+
 # shellcheck disable=SC1091
-source .config
+! test -z "${sourceConf}" || sourceConf=".config"
+
+# Source the configuration file if it exists
+if test -f "${sourceConf}" ; then
+    source "${sourceConf}"
+else
+    app_error "Configuration file not found: ${sourceConf}"
+fi
 
 # Set default value for installation directory
 appInstallDir=${APP_INSTALL_DIR:-"/usr/local/bin"}
 
+# Some applications use a configuration file in, but by default this not set
+useConfig=${USE_CONFIG:-"false"}
+useConfigD=${USE_CONFIG_D:-"false"}
+! test "${useConfig}" = "false" || appConfig=${APP_CONFIG:-"/etc/${PACKAGE}.conf"}
+! test "${useConfig}" = "false" || useConfigD=${APP_CONFIG_D:-"/etc/${PACKAGE}.conf.d"}
 
-# Set default value for /etc installation to false by default.
-hasConfETC=${HAS_ETC_FILE:-"false"}
+# Allow for helper scripts/binaries to be installed via the `/usr/lib/` path.
+useLib=${USE_LIB:-"false"}
+! test "${useLib}" = "false" || libDir=${LIB_DIR:-"/usr/lib/${PACKAGE}"}
 
-# Only set the appETC variable if hasConfETC is true
-test "${hasConfETC}" = "false" || appETC=${HAS_ETC_FILE:-"/etc/${appName}.conf"}
+# Allow for basic documentation to be installed.
+appDoc=${APP_DOC:-"/usr/share/doc/${PACKAGE}"}
+
+# Debian changelogs
+debianChange=${DEBIAN_CHANGELOG:-"DEBIAN/changelog"}
+appChangelog=${APP_CHANGELOG:-"changelog.DEBIAN"}
+
+# Manpages
+hasManpage=${HAS_MANPAGE:-"false"}
+! test "${hasManpage}" = "false" || {
+    manpageDir=${MANPAGE_DIR:="/usr/share/man/man8"} ; manpageFile=${MANPAGE_FILE:="${PACKAGE}.8"}
+}
+
+echo "${PACKAGE} version: ${FULL_VERSION}"
 
 
